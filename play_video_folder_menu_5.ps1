@@ -10,12 +10,12 @@ je protreba nainstlovat program "mvp" pro windows viz. radek 66
 pri kompilaci do exe souboru trochu blbne vystup viz. screenshot, takze radeji nechat takto jako script a poustet
 treba prikazem "powershell -File video_menu_ps1" z davkoviho souboru apod.
 upne do dlouhej vypis napovedy pro mpv, vsechny mozny paorametry, rychlost prehravani vide, mute atd. atd. - Total: 1110 options
-takze hrat si z radem cislo 110
+takze hrat si z radem 114
 
 asi lepsi zpusob nez vytvaret nejaky playlisty, ti pak muset aktualizovat, takle proste prehraje co je aktualne v adresari
 bez nakyho dalsiho srani z necim
 z malou modifikaci prehrava i soubory wav, mp3, flac atd. v adresari "C:\Users\DELL\Music\"
-upravit radek 32 a 88 
+upravit radek 32 a 92 
 priklad : $pripony = @("*.mp3", "*.wav", "*.ogg", "*.flac")
 na obrazku mpv_keyboard_control.jpg neuveritelne bohaty ovladani programu mpv pomoci klavesnice
 napr. klavesa mezernik pause/unpause videa, klavesa "f" pro ciklovani mezi fullscreen nebo prehravani videa v okne 
@@ -26,7 +26,7 @@ klavesa "m" mute/unmute a dalsi a dasli
 $scriptName += $MyInvocation.MyCommand.Name
 $host.UI.RawUI.WindowTitle = $scriptName
 
-Remove-Variable vybran_adresar, d_adresare, adresare, aa -ErrorAction SilentlyContinue
+Remove-Variable vybran_adresar, d_adresare, adresare, aa, d_files, file, files -ErrorAction SilentlyContinue
 
 ##################################################################################
 $cesta_folder_videos = "C:\Users\DELL\Videos\" #  <<<<<<<   tady menit podle sebe
@@ -40,7 +40,7 @@ Exit 1
 
 $poc = 1
 $adresare = @($cesta_folder_videos) # klic 0 bude prazdny
-$out_1 = "0) "
+$out_1 = " 0) "
 $out_1 += $adresare[0]
 echo $out_1
 
@@ -49,7 +49,7 @@ $d_adresare = $adresare.Length -1
 #echo $d_adresare
 
 for ( $aa = 1; $aa -le $d_adresare; $aa++ ) {
-$out_2 = ""
+$out_2 = " "
 $out_2 += $poc
 $out_2 += ") "
 $out_2 += $cesta_folder_videos
@@ -76,7 +76,7 @@ $soubory += "\"
 }
 
 
-$mpv = ("C:\Program Files (x86)\mpv-x86_64\mpv.com") # << toto menit podle sebe ( nechat com )
+$mpv = ("C:\Program Files (x86)\mpv-x86_64\mpv") # << toto menit podle sebe ( nechat com )
 # pozor je tam soubor mpv.com a mpv.exe
 # kdyz je $mpv = ("C:\Program Files (x86)\mpv-x86_64\mpv.exe") tak pousi videa ne za sebou ale vsechny na jednou treba 80 videji !  
 if (-not (Test-Path $mpv)){
@@ -85,12 +85,16 @@ sleep 3
 exit
 }
 
+$files=@() #  < toto tady musi byt jinak pri jednom souboru v adresari dela $files.GetType() = String a pri nule a nebo
+# vice nez jednom souboru zase dala $files.GetType() = Array ( cili mu rict ze vzdycky a je tip Array)
+# promenna $d_files pak misto poctu prvku pole ukazuje delku retezce strings jako pocet videi v adresari
+# docela dlouho jsem hledal proc je chyba kdy to psalo kraviny
 $pripony = @("*.mp4", "*.avi", "*.mpg") # pripovny videa toto lze menit podle sebe viz na zacatku prehavani hudby
 # v ceste $cesta_folder_videos nacita soubory z vybraneho adresare
 if ( $vybran_adresar -ne 0 ) {
-$files = Get-ChildItem -path $soubory -include $pripony -recurse -name  | Sort-Object
+$files += Get-ChildItem -path $soubory -include $pripony -recurse -name  | Sort-Object # pridej do prazdnyho pole ( typ Array)
 }else{
-$files = Get-ChildItem -path $soubory -include $pripony -Name  | Sort-Object
+$files += Get-ChildItem -path $soubory -include $pripony -Name  | Sort-Object
 # jenom soubory z pole $propony a bez adresaru ^^^
 }
 
